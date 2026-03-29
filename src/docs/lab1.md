@@ -89,13 +89,13 @@ Controller → Service → Repository → Model
 Застосунок надає такі REST API ендпоінти:
 
 ### Отримати всі книги
-GET /api/books
+`GET /api/books`
 
 ### Отримати книгу за ID
-GET /api/books/:id
+`GET /api/books/:id`
 
 ### Створити нову книгу
-POST /api/books
+`POST /api/books`
 
 **Приклад тіла запиту:**
 ```json
@@ -107,45 +107,46 @@ POST /api/books
   "description": "Опис книги",
   "isRead": true
 }
+```
+### Оновити книгу
+`PUT /api/books/:id`
 
-Оновити книгу
-PUT /api/books/:id
-
-Видалити книгу
-DELETE /api/books/:id
+### Видалити книгу
+`DELETE /api/books/:id`
 
 
-HTTP статус-коди
+## HTTP статус-коди
 API повертає наступні статус-коди:
-200 OK — успішний запит
-201 Created — ресурс створено
-400 Bad Request — некоректні вхідні дані
-404 Not Found — ресурс не знайдено
-500 Internal Server Error — помилка сервера
+- 200 OK — успішний запит
+- 201 Created — ресурс створено
+- 400 Bad Request — некоректні вхідні дані
+- 404 Not Found — ресурс не знайдено
+- 500 Internal Server Error — помилка сервера
 
-Тестування
+## Тестування
 API можна тестувати за допомогою:
-Postman
-curl
-Swagger (за наявності)
-Використані технології
-Node.js
-Express.js
-TypeScript
-In-memory storage (масив)
-ESLint / Prettier
+- Postman
+- curl
+- Swagger (за наявності)
 
-Командна робота
+## Використані технології
+- Node.js
+- Express.js
+- TypeScript
+- In-memory storage (масив)
+- ESLint / Prettier
+
+## Командна робота
 Проєкт розробляється командно з використанням GitHub:
-кожен учасник працює у власній гілці
-зміни завантажуються у відповідні гілки
-створюються Pull Request у основну гілку (lab1)
-код переглядається та об’єднується після перевірки
+- кожен учасник працює у власній гілці
+- зміни завантажуються у відповідні гілки
+- створюються Pull Request у основну гілку (lab1)
+- код переглядається та об’єднується після перевірки
 
-Git workflow
-Клонування репозиторію
-Перехід на гілку lab1
-Створення власної гілки (наприклад lab1-controller)
-Реалізація завдання
-Коміт та push змін
-Створення Pull Request
+## Git workflow
+- Клонування репозиторію
+- Перехід на гілку lab1
+- Створення власної гілки (наприклад lab1-controller)
+- Реалізація завдання
+- Коміт та push змін
+- Створення Pull Request
