@@ -16,6 +16,10 @@ class BookController {
   public async getById(req: Request, res: Response): Promise<void> {
     try {
       const id = Number(req.params.id);
+      if (isNaN(id)) {
+        res.status(400).json({ message: 'ID має бути числом' });
+        return;
+      }
       const book = await bookService.getBookById(id);
       res.status(200).json(book);
     } catch (error: unknown) {
@@ -45,6 +49,10 @@ class BookController {
   public async update(req: Request, res: Response): Promise<void> {
     try {
       const id = Number(req.params.id);
+      if (isNaN(id)) {
+        res.status(400).json({ message: 'ID має бути числом' });
+        return;
+      }
       const updatedBook = await bookService.updateBook(
         id,
         req.body as Omit<Partial<Book>, 'id'>
@@ -62,6 +70,10 @@ class BookController {
   public async delete(req: Request, res: Response): Promise<void> {
     try {
       const id = Number(req.params.id);
+      if (isNaN(id)) {
+        res.status(400).json({ message: 'ID має бути числом' });
+        return;
+      }
       await bookService.deleteBook(id);
       res.status(200).json({ message: 'Книга видалена' });
     } catch (error: unknown) {
