@@ -16,6 +16,8 @@
 
 ## Опис проєкту
 
+[GitHub Репозиторій: 2-course-kpi](https://github.com/AnnKuts/2-course-kpi/tree/main)
+
 Даний проєкт є **монолітним бекенд-застосунком**, який надає REST API для управління колекцією книг.
 
 Застосунок дозволяє виконувати базові CRUD-операції:
@@ -29,11 +31,37 @@
 
 ---
 
+## Структура проєкту
+
+```text
+src/
+ ├── controllers/       # Обробка HTTP-запитів (book.controller.ts)
+ ├── services/          # Бізнес-логіка (book.service.ts)
+ ├── repos/             # Робота з даними (book.repository.ts)
+ ├── models/            # Опис сутностей (book.model.ts)
+ ├── routes/            # Налаштування маршрутів (book.router.ts)
+ ├── server.ts          # Конфігурація Express-додатку
+ └── main.ts            # Точка входу, запуск сервера
+```
+
 ## Архітектура проєкту
 
 Застосунок побудований за принципом шарової архітектури:
 Controller → Service → Repository → Model
 
+### Діаграма архітектури
+
+```mermaid
+graph LR
+    Client([Клієнт / Postman]) -->|HTTP Запит| Controller
+    Controller -->|DTO| Service
+    Service -->|Виклик методів| Repository
+    Repository -->|CRUD операції| Database[(In-memory Масив)]
+    
+    Service -.-> Model
+    Repository -.-> Model
+    Controller -.-> Model
+```
 
 ### Опис шарів:
 
@@ -142,11 +170,3 @@ API можна тестувати за допомогою:
 - зміни завантажуються у відповідні гілки
 - створюються Pull Request у основну гілку (lab1)
 - код переглядається та об’єднується після перевірки
-
-## Git workflow
-- Клонування репозиторію
-- Перехід на гілку lab1
-- Створення власної гілки (наприклад lab1-controller)
-- Реалізація завдання
-- Коміт та push змін
-- Створення Pull Request
