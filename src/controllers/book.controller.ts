@@ -1,8 +1,8 @@
 //here will be controllers
 import { Request, Response } from 'express';
 
-import { Book } from '../models/book.model';
 import { bookService } from '../services/book.service';
+import { getErrorMessage } from '../utils/errorHandler';
 
 class BookController {
   private getIdOrRespond(req: Request, res: Response): number | null {
@@ -31,26 +31,16 @@ class BookController {
       const book = await bookService.getBookById(id);
       res.status(200).json(book);
     } catch (error: unknown) {
-      if (error instanceof Error) {
-        res.status(404).json({ message: error.message });
-      } else {
-        res.status(404).json({ message: 'Unknown error' });
-      }
+      res.status(404).json({ message: getErrorMessage(error) });
     }
   }
 
   public async create(req: Request, res: Response): Promise<void> {
     try {
-      const newBook = await bookService.createBook(
-        req.body as Omit<Book, 'id'>,
-      );
+      const newBook = await bookService.createBook(req.body);
       res.status(201).json(newBook);
     } catch (error: unknown) {
-      if (error instanceof Error) {
-        res.status(400).json({ message: error.message });
-      } else {
-        res.status(400).json({ message: 'Unknown error' });
-      }
+      res.status(400).json({ message: getErrorMessage(error) });
     }
   }
 
@@ -59,17 +49,10 @@ class BookController {
       const id = this.getIdOrRespond(req, res);
       if (id === null) return;
 
-      const updatedBook = await bookService.updateBook(
-        id,
-        req.body as Omit<Partial<Book>, 'id'>,
-      );
+      const updatedBook = await bookService.updateBook(id, req.body);
       res.status(200).json(updatedBook);
     } catch (error: unknown) {
-      if (error instanceof Error) {
-        res.status(404).json({ message: error.message });
-      } else {
-        res.status(404).json({ message: 'Unknown error' });
-      }
+      res.status(404).json({ message: getErrorMessage(error) });
     }
   }
 
@@ -79,13 +62,9 @@ class BookController {
       if (id === null) return;
 
       await bookService.deleteBook(id);
-      res.status(200).json({ message: 'Книга видалена' });
+      res.status(204).send();
     } catch (error: unknown) {
-      if (error instanceof Error) {
-        res.status(404).json({ message: error.message });
-      } else {
-        res.status(404).json({ message: 'Unknown error' });
-      }
+      res.status(404).json({ message: getErrorMessage(error) });
     }
   }
 }
