@@ -1,7 +1,8 @@
 //here will be controllers
 import { Request, Response } from 'express';
-import { bookService } from '../services/book.service';
+
 import { Book } from '../models/book.model';
+import { bookService } from '../services/book.service';
 
 class BookController {
   private getIdOrRespond(req: Request, res: Response): number | null {
@@ -41,7 +42,7 @@ class BookController {
   public async create(req: Request, res: Response): Promise<void> {
     try {
       const newBook = await bookService.createBook(
-        req.body as Omit<Book, 'id'>
+        req.body as Omit<Book, 'id'>,
       );
       res.status(201).json(newBook);
     } catch (error: unknown) {
@@ -60,7 +61,7 @@ class BookController {
 
       const updatedBook = await bookService.updateBook(
         id,
-        req.body as Omit<Partial<Book>, 'id'>
+        req.body as Omit<Partial<Book>, 'id'>,
       );
       res.status(200).json(updatedBook);
     } catch (error: unknown) {

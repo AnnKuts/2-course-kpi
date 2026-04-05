@@ -1,10 +1,5 @@
-export enum Genre {
-  Fiction = "Fiction",
-  Fantasy = "Fantasy",
-  Science = "Science",
-  Romance = "Romance",
-  Horror = "Horror",
-}
+import { Genre } from '../schemas/book.schema';
+
 export interface Book {
   id: number;
   title: string;
@@ -14,4 +9,3 @@ export interface Book {
   description: string;
   isRead: boolean;
 }
-//gonna be normalised later

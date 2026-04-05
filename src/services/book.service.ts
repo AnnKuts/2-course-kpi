@@ -1,9 +1,6 @@
-// here will be services
-
-import { bookRepository } from '../repos/book.repository';
 import { Book } from '../models/book.model';
-
-export type CreateBookDto = Omit<Book, 'id'>;
+import { bookRepository } from '../repos/book.repository';
+import { CreateBookDto, createBookSchema } from '../schemas/book.schema';
 
 class BookService {
   private currentId = 1;
@@ -20,31 +17,37 @@ class BookService {
     return book;
   }
 
-  public async createBook(bookDto: CreateBookDto): Promise<Book> {
-    if (!bookDto.title || !bookDto.author) {
-      throw new Error(`Назва та автор обов'язкові`);
-    }
+  public async createBook(data: unknown): Promise<Book> {
+    const parsed: CreateBookDto = createBookSchema.parse(data);
 
     const newBook: Book = {
       id: this.currentId++,
-      ...bookDto,
+      ...parsed,
     };
 
     return await bookRepository.create(newBook);
   }
 
-  public async updateBook(id: number, bookDto: Omit<Partial<Book>, 'id'>): Promise<Book> {
-    const updatedBook = await bookRepository.update(id, bookDto);
-    if (!updatedBook) {
-      throw new Error(`Неможливо оновити: Книга з ID ${id} не знайдена`);
+  public async updateBook(id: number, data: unknown): Promise<Book> {
+    const existing = await bookRepository.findById(id);
+    if (!existing) {
+      throw new Error(`Книга з ID ${id} не знайдена`);
     }
+
+    const parsed = createBookSchema.partial().parse(data);
+
+    const updatedBook = await bookRepository.update(id, parsed);
+    if (!updatedBook) {
+      throw new Error('Не вдалося оновити книгу');
+    }
+
     return updatedBook;
   }
 
   public async deleteBook(id: number): Promise<void> {
     const isDeleted = await bookRepository.delete(id);
     if (!isDeleted) {
-      throw new Error(`Неможливо видалити: Книга з ID ${id} не знайдена`);
+      throw new Error(`Книга з ID ${id} не знайдена`);
     }
   }
 }

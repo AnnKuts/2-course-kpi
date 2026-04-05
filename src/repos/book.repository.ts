@@ -1,5 +1,4 @@
 // here will be repositories for app
-
 import { Book } from '../models/book.model';
 
 class BookRepository {
@@ -19,7 +18,10 @@ class BookRepository {
     return { ...book };
   }
 
-  public async update(id: number, updatedData: Omit<Partial<Book>, 'id'>): Promise<Book | null> {
+  public async update(
+    id: number,
+    updatedData: Omit<Partial<Book>, 'id'>,
+  ): Promise<Book | null> {
     const index = this.books.findIndex((book) => book.id === id);
     if (index === -1) return null;
 
