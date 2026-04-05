@@ -1,116 +1,115 @@
-# Лабораторна робота №1
+# Lab Work 1
 
-## Тема
+## Topic
 
-Створення монолітного CRUD-застосунку з використанням шарової архітектури
+Building a monolithic CRUD backend using layered architecture.
 
----
+## Goal
 
-## Мета роботи
+- Understand layered architecture principles.
+- Separate responsibilities across application layers.
+- Implement a simple REST API.
+- Practice team workflow with GitHub branches and pull requests.
 
-Метою даної лабораторної роботи є:
+## Project Overview
 
-- ознайомлення з принципами шарової архітектури
-- навчитися правильно розділяти відповідальність між компонентами системи
-- реалізація простого REST API
-- отримання навичок командної роботи з GitHub
+[GitHub Repository: 2-course-kpi](https://github.com/AnnKuts/2-course-kpi/tree/main)
 
----
+This project is a **monolithic backend application** that provides a REST API for managing a collection of books.
 
-## Опис проєкту
+Supported CRUD operations:
 
-[GitHub Репозиторій: 2-course-kpi](https://github.com/AnnKuts/2-course-kpi/tree/main)
+- Create a book
+- Read all books
+- Read book by ID
+- Update a book
+- Delete a book
 
-Даний проєкт є **монолітним бекенд-застосунком**, який надає REST API для управління колекцією книг.
+Data is stored in an **in-memory array**, not in a database.
 
-Застосунок дозволяє виконувати базові CRUD-операції:
-
-- створення книги
-- отримання списку книг
-- отримання книги за ID
-- оновлення книги
-- видалення книги
-
-Дані зберігаються у **in-memory сховищі (масиві)** замість використання реальної бази даних.
-
----
-
-## Структура проєкту
+## Project Structure
 
 ```text
 src/
- ├── controllers/       # Обробка HTTP-запитів (book.controller.ts)
- ├── services/          # Бізнес-логіка (book.service.ts)
- ├── repos/             # Робота з даними (book.repository.ts)
- ├── models/            # Опис сутностей (book.model.ts)
- ├── routes/            # Налаштування маршрутів (book.router.ts)
- ├── server.ts          # Конфігурація Express-додатку
- └── main.ts            # Точка входу, запуск сервера
+ ├── controllers/      # HTTP layer (book.controller.ts)
+ ├── services/         # Business logic + validation (book.service.ts)
+ ├── repos/            # Data access layer (book.repository.ts)
+ ├── models/           # Domain entity contracts (book.model.ts)
+ ├── schemas/          # Zod schemas and DTO types (book.schema.ts)
+ ├── utils/            # Shared helpers (error handlers, custom errors)
+ ├── routes/           # Route registration (book.router.ts)
+ ├── server.ts         # Express app setup
+ └── main.ts           # Application entry point
 ```
 
-## Архітектура проєкту
+## Architecture
 
-Застосунок побудований за принципом шарової архітектури:
-Controller → Service → Repository → Model
+The application follows this layered flow:
 
-### Діаграма архітектури
+`Controller -> Service -> Repository -> Model`
+
+### Architecture Diagram (Mermaid)
 
 ```mermaid
 graph LR
-    Client([Клієнт / Postman]) -->|HTTP Запит| Controller
-    Controller -->|DTO| Service
-    Service -->|Виклик методів| Repository
-    Repository -->|CRUD операції| Database[(In-memory Масив)]
+    Client([Client / Postman]) -->|HTTP Request| Router
+    Router --> Controller
+    Controller -->|body/params| Service
+    Service -->|validate input| Schemas[Zod Schemas]
+    Service -->|Method Calls| Repository
+    Repository -->|CRUD Operations| Storage[(In-memory Array)]
 
     Service -.-> Model
     Repository -.-> Model
-    Controller -.-> Model
+    Controller -.-> ErrorHandler[Error Handler]
+    ErrorHandler -->|maps errors| HttpStatus[400 / 404 / 500]
 ```
 
-### Опис шарів:
+### Layer Responsibilities
 
-#### 1. Controller
+1. **Controller**
+   - Accepts HTTP requests.
+   - Validates simple route params (for example, numeric ID).
+   - Calls service methods.
+   - Returns HTTP responses.
 
-- приймає HTTP-запити
-- обробляє параметри запиту та тіло запиту
-- викликає методи сервісного шару
-- повертає HTTP-відповіді з відповідними статус-кодами
+2. **Service**
+   - Contains business logic.
+   - Performs request body validation via Zod.
+   - Throws domain-specific errors (`NotFoundError`, validation errors).
+   - Calls repository methods.
 
-#### 2. Service
+3. **Repository**
+   - Works with data storage (in-memory array).
+   - Implements CRUD data operations.
+   - Returns plain model objects.
 
-- містить бізнес-логіку
-- виконує валідацію даних
-- реалізує правила роботи застосунку
-- взаємодіє з Repository
+4. **Model**
+   - Defines the `Book` entity shape used across layers.
 
-#### 3. Repository
+### Validation and Error Flow
 
-- відповідає за роботу з даними
-- використовує in-memory масив для зберігання книг
-- надає методи для CRUD-операцій
+- Zod schemas are defined in `src/schemas/book.schema.ts`.
+- Validation is executed in the service layer (`createBookSchema.parse(...)`).
+- Validation errors are mapped to `400 Bad Request`.
+- Not-found conditions are represented with `NotFoundError` and mapped to `404 Not Found`.
+- Unexpected errors are mapped to `500 Internal Server Error`.
 
-#### 4. Model
+## Domain Model
 
-- описує структуру сутностей
-- визначає вигляд об’єкта Book
+Main entity: **Book**
 
----
+Fields:
 
-## Предметна область
+- `id`: unique numeric identifier
+- `title`: book title
+- `author`: author name
+- `genre`: one of allowed genres
+- `rating`: numeric rating from 0 to 5
+- `description`: text description
+- `isRead`: read status (`true`/`false`)
 
-Основна сутність системи — **Book (Книга)**.
-
-### Поля:
-
-- `id` — унікальний ідентифікатор
-- `title` — назва книги
-- `author` — автор
-- `genre` — жанр книги
-- `rating` — рейтинг (0–5)
-- `description` — опис
-- `isRead` — чи прочитана книга
-
-### Жанри (Genre):
+Allowed `genre` values:
 
 - Fiction
 - Fantasy
@@ -118,77 +117,68 @@ graph LR
 - Romance
 - Horror
 
----
+## Zod Validation Rules
 
-## API Ендпоінти
+`createBookSchema` validates incoming book payloads:
 
-Застосунок надає такі REST API ендпоінти:
+- `title`: required non-empty string
+- `author`: required non-empty string
+- `genre`: enum (`Fiction | Fantasy | Science | Romance | Horror`)
+- `rating`: number between `0` and `5`
+- `description`: string
+- `isRead`: boolean
 
-### Отримати всі книги
+For updates, partial validation is used (`createBookSchema.partial()`), so only provided fields are validated.
 
-`GET /api/books`
+## API Endpoints
 
-### Отримати книгу за ID
+- `GET /api/books` - Get all books
+- `GET /api/books/:id` - Get a book by ID
+- `POST /api/books` - Create a new book
+- `PUT /api/books/:id` - Update a book
+- `DELETE /api/books/:id` - Delete a book
 
-`GET /api/books/:id`
-
-### Створити нову книгу
-
-`POST /api/books`
-
-**Приклад тіла запиту:**
+### Example request body (`POST /api/books`)
 
 ```json
 {
-  "title": "Назва книги",
-  "author": "Автор",
-  "genre": "Fiction",
+  "title": "Clean Code",
+  "author": "Robert C. Martin",
+  "genre": "Science",
   "rating": 5,
-  "description": "Опис книги",
+  "description": "A book about software craftsmanship.",
   "isRead": true
 }
 ```
 
-### Оновити книгу
+## HTTP Status Codes
 
-`PUT /api/books/:id`
+- `200 OK`: successful read/update request
+- `201 Created`: resource created
+- `204 No Content`: successful delete request
+- `400 Bad Request`: invalid input data
+- `404 Not Found`: resource not found
+- `500 Internal Server Error`: unexpected server error
 
-### Видалити книгу
+## Testing
 
-`DELETE /api/books/:id`
-
-## HTTP статус-коди
-
-API повертає наступні статус-коди:
-
-- 200 OK — успішний запит
-- 201 Created — ресурс створено
-- 400 Bad Request — некоректні вхідні дані
-- 404 Not Found — ресурс не знайдено
-- 500 Internal Server Error — помилка сервера
-
-## Тестування
-
-API можна тестувати за допомогою:
+You can test the API using:
 
 - Postman
 - curl
-- Swagger (за наявності)
 
-## Використані технології
+## Technologies
 
 - Node.js
 - Express.js
 - TypeScript
-- In-memory storage (масив)
-- ESLint / Prettier
 - Zod
+- ESLint / Prettier
+- In-memory storage (array)
 
-## Командна робота
+## Team Workflow
 
-Проєкт розробляється командно з використанням GitHub:
-
-- кожен учасник працює у власній гілці
-- зміни завантажуються у відповідні гілки
-- створюються Pull Request у основну гілку (lab1)
-- код переглядається та об’єднується після перевірки
+- Each team member works in a separate branch.
+- Changes are pushed to feature branches.
+- Pull requests are created into the base lab branch.
+- Code is reviewed before merge.

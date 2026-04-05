@@ -13,7 +13,7 @@ class BookService {
   public async getBookById(id: number): Promise<Book> {
     const book = await bookRepository.findById(id);
     if (!book) {
-      throw new NotFoundError(`Книга з ID ${id} не знайдена`);
+      throw new NotFoundError(`Book with ID ${id} not found`);
     }
     return book;
   }
@@ -32,14 +32,14 @@ class BookService {
   public async updateBook(id: number, data: unknown): Promise<Book> {
     const existing = await bookRepository.findById(id);
     if (!existing) {
-      throw new NotFoundError(`Книга з ID ${id} не знайдена`);
+      throw new NotFoundError(`Book with ID ${id} not found`);
     }
 
     const parsed = createBookSchema.partial().parse(data);
 
     const updatedBook = await bookRepository.update(id, parsed);
     if (!updatedBook) {
-      throw new NotFoundError('Не вдалося оновити книгу');
+      throw new NotFoundError('Failed to update book');
     }
 
     return updatedBook;
@@ -48,7 +48,7 @@ class BookService {
   public async deleteBook(id: number): Promise<void> {
     const isDeleted = await bookRepository.delete(id);
     if (!isDeleted) {
-      throw new NotFoundError(`Книга з ID ${id} не знайдена`);
+      throw new NotFoundError(`Book with ID ${id} not found`);
     }
   }
 }

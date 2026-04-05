@@ -9,8 +9,8 @@ export const genreSchema = z.enum([
 ]);
 
 export const createBookSchema = z.object({
-  title: z.string().min(1, "Назва обов'язкова"),
-  author: z.string().min(1, "Автор обов'язковий"),
+  title: z.string().min(1, 'Title is required'),
+  author: z.string().min(1, 'Author is required'),
   genre: genreSchema,
   rating: z.number().min(0).max(5),
   description: z.string(),

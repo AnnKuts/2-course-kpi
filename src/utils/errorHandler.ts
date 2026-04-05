@@ -13,7 +13,7 @@ const formatZodError = (error: ZodError): string => {
 
 export const getErrorMessage = (
   error: unknown,
-  fallbackMessage = 'Сталася невідома помилка',
+  fallbackMessage = 'An unknown error occurred',
 ): string => {
   if (error instanceof ZodError) {
     return formatZodError(error);

@@ -1,4 +1,3 @@
-//here will be controllers
 import { Request, Response } from 'express';
 
 import { bookService } from '../services/book.service';
@@ -14,7 +13,7 @@ class BookController {
   private getIdOrRespond(req: Request, res: Response): number | null {
     const id = Number(req.params.id);
     if (isNaN(id)) {
-      res.status(400).json({ message: 'ID має бути числом' });
+      res.status(400).json({ message: 'ID must be a number' });
       return null;
     }
     return id;
