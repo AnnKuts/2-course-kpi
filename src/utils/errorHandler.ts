@@ -1,5 +1,7 @@
 import { ZodError } from 'zod';
 
+import { NotFoundError } from './httpErrors';
+
 const formatZodError = (error: ZodError): string => {
   return error.issues
     .map((issue) => {
@@ -22,4 +24,16 @@ export const getErrorMessage = (
   }
 
   return fallbackMessage;
+};
+
+export const getErrorStatus = (error: unknown): number => {
+  if (error instanceof ZodError) {
+    return 400;
+  }
+
+  if (error instanceof NotFoundError) {
+    return 404;
+  }
+
+  return 500;
 };

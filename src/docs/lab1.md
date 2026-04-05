@@ -182,6 +182,7 @@ API можна тестувати за допомогою:
 - TypeScript
 - In-memory storage (масив)
 - ESLint / Prettier
+- Zod
 
 ## Командна робота
 

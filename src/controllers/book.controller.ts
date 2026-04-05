@@ -2,9 +2,15 @@
 import { Request, Response } from 'express';
 
 import { bookService } from '../services/book.service';
-import { getErrorMessage } from '../utils/errorHandler';
+import { getErrorMessage, getErrorStatus } from '../utils/errorHandler';
 
 class BookController {
+  private handleError(res: Response, error: unknown): void {
+    const status = getErrorStatus(error);
+    const message = getErrorMessage(error);
+    res.status(status).json({ message });
+  }
+
   private getIdOrRespond(req: Request, res: Response): number | null {
     const id = Number(req.params.id);
     if (isNaN(id)) {
@@ -18,8 +24,8 @@ class BookController {
     try {
       const books = await bookService.getAllBooks();
       res.status(200).json(books);
-    } catch {
-      res.status(500).json({ message: 'Помилка сервера' });
+    } catch (error: unknown) {
+      this.handleError(res, error);
     }
   }
 
@@ -31,7 +37,7 @@ class BookController {
       const book = await bookService.getBookById(id);
       res.status(200).json(book);
     } catch (error: unknown) {
-      res.status(404).json({ message: getErrorMessage(error) });
+      this.handleError(res, error);
     }
   }
 
@@ -40,7 +46,7 @@ class BookController {
       const newBook = await bookService.createBook(req.body);
       res.status(201).json(newBook);
     } catch (error: unknown) {
-      res.status(400).json({ message: getErrorMessage(error) });
+      this.handleError(res, error);
     }
   }
 
@@ -52,7 +58,7 @@ class BookController {
       const updatedBook = await bookService.updateBook(id, req.body);
       res.status(200).json(updatedBook);
     } catch (error: unknown) {
-      res.status(404).json({ message: getErrorMessage(error) });
+      this.handleError(res, error);
     }
   }
 
@@ -64,7 +70,7 @@ class BookController {
       await bookService.deleteBook(id);
       res.status(204).send();
     } catch (error: unknown) {
-      res.status(404).json({ message: getErrorMessage(error) });
+      this.handleError(res, error);
     }
   }
 }
