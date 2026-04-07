@@ -35,6 +35,8 @@
     "jsonfile": "^6.2.0",
     "module-alias": "^2.3.4",
     "morgan": "^1.10.1",
+    "sqlite": "^5.1.1",
+    "sqlite3": "^6.0.1",
     "tspo": "^1.0.7",
     "zod": "^4.3.6"
   },
@@ -43,12 +45,13 @@
     "@swc/core": "^1.15.21",
     "@trivago/prettier-plugin-sort-imports": "^6.0.2",
     "@types/cookie-parser": "^1.4.10",
+    "@types/express": "^5.0.6",
     "@types/find": "^0.2.4",
     "@types/fs-extra": "^11.0.4",
     "@types/jsonfile": "^6.1.4",
     "@types/module-alias": "^2.0.4",
     "@types/morgan": "^1.9.10",
-    "@types/node": "^25.5.0",
+    "@types/node": "^25.5.2",
     "@types/supertest": "^7.2.0",
     "browser-sync": "^3.0.4",
     "concurrently": "^9.2.1",
@@ -67,6 +70,6 @@
     "tsconfig-paths": "^4.2.0",
     "typescript": "^5.9.3",
     "typescript-eslint": "^8.57.2",
-    "vitest": "^4.1.1"
+    "vitest": "^4.1.3"
   }
 }
