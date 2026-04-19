@@ -1,11 +1,34 @@
 import express from 'express';
-
-import bookRouter from './routes/book.router';
+import { bookRepository } from './infrastructure/repositories/book.repository';
+import { BookController } from './presentation/controllers/book.controller';
+import { createBookRouter } from './routes/book.router';
+import {
+  GetAllBooksUseCase, GetBookByIdUseCase, CreateBookUseCase,
+  UpdateBookUseCase, DeleteBookUseCase, GetReadBooksUseCase,
+  RateBookUseCase, MarkAsReadUseCase
+} from './application/use-cases/BookUseCases';
+import { errorMiddleware } from './middlewares/error.middleware';
 
 const app = express();
-
 app.use(express.json());
 
-app.use('/api/books', bookRouter);
+const useCases = {
+  getAllBooks: new GetAllBooksUseCase(bookRepository),
+  getBookById: new GetBookByIdUseCase(bookRepository),
+  createBook: new CreateBookUseCase(bookRepository),
+  updateBook: new UpdateBookUseCase(bookRepository),
+  deleteBook: new DeleteBookUseCase(bookRepository),
+  getReadBooks: new GetReadBooksUseCase(bookRepository),
+  rateBook: new RateBookUseCase(bookRepository),
+  markAsRead: new MarkAsReadUseCase(bookRepository)
+};
+
+const bookController = new BookController(useCases);
+
+const bookRouter = createBookRouter(bookController);
+
+app.use('/books', bookRouter);
+
+app.use(errorMiddleware);
 
 export default app;
