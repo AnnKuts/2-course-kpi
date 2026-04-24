@@ -1,22 +1,25 @@
-import logger from 'jet-logger';
-import server from './server';
 import { initDb } from './infrastructure/database/database';
+import { createServer } from './server';
 
-const PORT = process.env.PORT || 3000;
+const PORT = 3000;
 
 async function bootstrap() {
   try {
-    await initDb();
-    logger.info('База даних SQLite успішно ініціалізована');
+    const db = await initDb();
+    console.log('База даних успішно ініціалізована');
 
-    server.listen(PORT, () => {
-      logger.info(`Server started on port: ${PORT}`);
+    const app = createServer(db);
+
+    app.listen(PORT, () => {
+      console.log(`Server started on port: ${PORT}`);
     });
   } catch (error) {
-    logger.err('Помилка під час запуску сервера:');
-    console.error(error);
+    console.error('Помилка під час запуску сервера:', error);
     process.exit(1);
   }
 }
 
-bootstrap();
+bootstrap().catch((error) => {
+  console.error('Непередбачена помилка під час запуску:', error);
+  process.exit(1);
+});
