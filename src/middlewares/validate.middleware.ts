@@ -1,0 +1,44 @@
+import { Request, Response, NextFunction } from 'express';
+import { ZodSchema, ZodError } from 'zod';
+
+export const validateBody = (schema: ZodSchema) => {
+  return (req: Request, res: Response, next: NextFunction): void => {
+    try {
+      schema.parse(req.body);
+      next();
+    } catch (error) {
+      if (error instanceof ZodError) {
+        res.status(400).json({
+          message: 'Помилка валідації даних',
+          errors: error.issues.map((issue) => ({ 
+            path: issue.path, 
+            message: issue.message 
+          }))
+        });
+        return;
+      }
+      next(error);
+    }
+  };
+};
+
+export const validateQuery = (schema: ZodSchema) => {
+  return (req: Request, res: Response, next: NextFunction): void => {
+    try {
+      req.query = schema.parse(req.query) as Request['query'];
+      next();
+    } catch (error) {
+      if (error instanceof ZodError) {
+        res.status(400).json({
+          message: 'Помилка валідації параметрів запиту',
+          errors: error.issues.map((issue) => ({ 
+            path: issue.path, 
+            message: issue.message 
+          }))
+        });
+        return;
+      }
+      next(error);
+    }
+  };
+};
