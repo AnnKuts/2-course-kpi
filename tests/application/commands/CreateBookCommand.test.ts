@@ -5,11 +5,12 @@ import { CreateBookCommandHandler } from '../../../src/application/commands/Crea
 import { IBookWriteRepository } from '../../../src/domain/repositories/IBookWriteRepository';
 import { Book } from '../../../src/domain/models/Book';
 import { Genre } from '../../../src/domain/models/Genre';
+import { IEventBus } from '../../../src/application/events/EventContracts';
 
 describe('CreateBookCommandHandler', () => {
   let handler: CreateBookCommandHandler;
-
   let mockWriteRepository: Mocked<IBookWriteRepository>;
+  let mockEventBus: Mocked<IEventBus>;
 
   beforeEach(() => {
     mockWriteRepository = {
@@ -19,16 +20,21 @@ describe('CreateBookCommandHandler', () => {
       delete: vi.fn(),
     };
 
-    handler = new CreateBookCommandHandler(mockWriteRepository);
+    mockEventBus = {
+      publish: vi.fn(),
+      subscribe: vi.fn(),
+    };
+
+    handler = new CreateBookCommandHandler(mockWriteRepository, mockEventBus);
   });
 
-  it('повинен створювати книгу та повертати її ID', async () => {
+  it('повинен успішно створити книгу, зберегти в репозиторій та опублікувати подію', async () => {
     const command = {
-      title: 'Тестова книга',
-      author: 'Тестовий автор',
+      title: 'Test Book',
+      author: 'Test Author',
       genre: Genre.FICTION,
       rating: 5,
-      description: 'Опис тестової книги',
+      description: 'Test Desc',
       isRead: false,
     };
 
@@ -36,17 +42,18 @@ describe('CreateBookCommandHandler', () => {
       1, command.title, command.author, command.genre, 
       command.rating, command.description, command.isRead
     );
+
     mockWriteRepository.create.mockResolvedValueOnce(createdBook);
 
     const resultId = await handler.execute(command);
 
     expect(resultId).toBe(1);
-
     expect(mockWriteRepository.create.mock.calls.length).toBe(1);
-
-    const savedBook = mockWriteRepository.create.mock.calls[0][0];
     
+    expect(mockEventBus.publish.mock.calls.length).toBe(1);
+    
+    const savedBook = mockWriteRepository.create.mock.calls[0][0];
     expect(savedBook).toBeInstanceOf(Book);
-    expect(savedBook.title).toBe('Тестова книга');
+    expect(savedBook.title).toBe('Test Book');
   });
 });

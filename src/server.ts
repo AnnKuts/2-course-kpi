@@ -17,6 +17,9 @@ import { GetReadBooksQueryHandler } from './application/queries/GetReadBooksQuer
 
 import { errorMiddleware } from './middlewares/error.middleware';
 
+import { InMemoryEventBus } from './infrastructure/events/InMemoryEventBus';
+import { ConsoleAuditService } from './audit/ConsoleAuditService';
+
 export const createServer = (db: Database) => {
   const app = express();
   app.use(express.json());
@@ -24,12 +27,17 @@ export const createServer = (db: Database) => {
   const bookWriteRepository = new BookWriteRepository(db as unknown as IDatabase);
   const bookReadRepository = new BookReadRepository(db as unknown as IDatabase);
 
+  const eventBus = new InMemoryEventBus();
+
+  const auditService = new ConsoleAuditService();
+
+  eventBus.subscribe('BookCreatedEvent', auditService);
+
   const useCases = {
     getAllBooks: new GetAllBooksQueryHandler(bookReadRepository),
     getBookById: new GetBookByIdQueryHandler(bookReadRepository),
     getReadBooks: new GetReadBooksQueryHandler(bookReadRepository),
-    
-    createBook: new CreateBookCommandHandler(bookWriteRepository),
+    createBook: new CreateBookCommandHandler(bookWriteRepository, eventBus),
     updateBook: new UpdateBookCommandHandler(bookWriteRepository),
     deleteBook: new DeleteBookCommandHandler(bookWriteRepository),
     rateBook: new RateBookCommandHandler(bookWriteRepository),

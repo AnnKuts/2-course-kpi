@@ -1,6 +1,8 @@
 import { BookFactory } from '../../domain/factories/BookFactory';
 import { IBookWriteRepository } from '../../domain/repositories/IBookWriteRepository';
 import { Genre } from '../../domain/models/Genre';
+import { IEventBus } from '../events/EventContracts';
+import { BookCreatedEvent } from '../../domain/events/BookCreatedEvent';
 
 export type CreateBookCommand = {
   title: string;
@@ -12,7 +14,10 @@ export type CreateBookCommand = {
 };
 
 export class CreateBookCommandHandler {
-  constructor(private readonly bookRepository: IBookWriteRepository) {}
+  constructor(
+    private readonly bookRepository: IBookWriteRepository,
+    private readonly eventBus: IEventBus
+  ) {}
 
   public async execute(command: CreateBookCommand): Promise<number> {
     const newBook = BookFactory.create(
@@ -27,6 +32,9 @@ export class CreateBookCommandHandler {
     
     const savedBook = await this.bookRepository.create(newBook);
     
+    const event = new BookCreatedEvent(savedBook.id, command.title, command.author);
+    
+    this.eventBus.publish(event);
     return savedBook.id; 
   }
 }
