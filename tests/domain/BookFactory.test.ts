@@ -1,7 +1,7 @@
 import { describe, it, expect } from 'vitest';
-import { BookFactory } from '../../src/domain/factories/BookFactory';
-import { Genre } from '../../src/domain/models/Genre';
-import { DomainError } from '../../src/domain/errors/DomainError';
+import { BookFactory } from '../../src/core/domain/factories/BookFactory';
+import { Genre } from '../../src/core/domain/models/Genre';
+import { DomainError } from '../../src/core/domain/errors/DomainError';
 
 describe('Book Domain Model & Factory', () => {
   it('should successfully create a valid book', () => {

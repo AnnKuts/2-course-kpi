@@ -3,7 +3,7 @@ import request from 'supertest';
 import { Express } from 'express';
 import { createServer } from '../../src/server';
 import { initDb } from '../../src/infrastructure/database/database';
-import { Genre } from '../../src/domain/models/Genre';
+import { Genre } from '../../src/core/domain/models/Genre';
 
 
 interface BookResponse {

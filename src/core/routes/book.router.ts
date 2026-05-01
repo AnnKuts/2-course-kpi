@@ -1,7 +1,7 @@
 import { Router } from 'express';
 import { BookController } from '../presentation/controllers/book.controller';
-import { catchAsync } from '../utils/catchAsync';
-import { validateBody } from '../middlewares/validate.middleware';
+import { catchAsync } from '../../utils/catchAsync';
+import { validateBody } from '../../middlewares/validate.middleware';
 import { createBookSchema } from '../schemas/book.schema';
 
 export function createBookRouter(bookController: BookController): Router {

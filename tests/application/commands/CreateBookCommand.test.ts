@@ -1,11 +1,11 @@
 import { describe, it, expect, vi, beforeEach } from 'vitest';
 import type { Mocked } from 'vitest';
 
-import { CreateBookCommandHandler } from '../../../src/application/commands/CreateBookCommand';
-import { IBookWriteRepository } from '../../../src/domain/repositories/IBookWriteRepository';
-import { Book } from '../../../src/domain/models/Book';
-import { Genre } from '../../../src/domain/models/Genre';
-import { IEventBus } from '../../../src/application/events/EventContracts';
+import { CreateBookCommandHandler } from '../../../src/core/application/commands/CreateBookCommand';
+import { IBookWriteRepository } from '../../../src/core/domain/repositories/IBookWriteRepository';
+import { Book } from '../../../src/core/domain/models/Book';
+import { Genre } from '../../../src/core/domain/models/Genre';
+import { IEventBus } from '../../../src/infrastructure/events/EventContracts';
 
 describe('CreateBookCommandHandler', () => {
   let handler: CreateBookCommandHandler;

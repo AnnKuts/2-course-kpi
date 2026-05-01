@@ -1,4 +1,4 @@
-import { IIntegrationEvent } from '../../application/events/EventContracts';
+import { IIntegrationEvent } from '../../../infrastructure/events/EventContracts';
 
 export class BookCreatedEvent implements IIntegrationEvent {
   public readonly eventName = 'BookCreatedEvent';
@@ -7,7 +7,7 @@ export class BookCreatedEvent implements IIntegrationEvent {
   constructor(
     public readonly bookId: number,
     public readonly title: string,
-    public readonly author: string
+    public readonly author: string,
   ) {
     this.occurredAt = new Date();
   }

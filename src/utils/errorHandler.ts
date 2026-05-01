@@ -1,7 +1,7 @@
 import { ZodError, ZodIssue } from 'zod';
 
-import { DomainError } from '../domain/errors/DomainError';
-import { NotFoundError } from '../domain/errors/NotFoundError';
+import { DomainError } from '../core/domain/errors/DomainError';
+import { NotFoundError } from '../core/domain/errors/NotFoundError';
 
 export function getErrorStatus(error: unknown): number {
   if (error instanceof NotFoundError) {

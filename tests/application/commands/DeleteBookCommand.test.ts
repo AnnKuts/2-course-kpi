@@ -1,9 +1,9 @@
 import { describe, it, expect, vi, beforeEach } from 'vitest';
 import type { Mocked } from 'vitest';
 
-import { DeleteBookCommandHandler } from '../../../src/application/commands/DeleteBookCommand';
-import { IBookWriteRepository } from '../../../src/domain/repositories/IBookWriteRepository';
-import { NotFoundError } from '../../../src/domain/errors/NotFoundError';
+import { DeleteBookCommandHandler } from '../../../src/core/application/commands/DeleteBookCommand';
+import { IBookWriteRepository } from '../../../src/core/domain/repositories/IBookWriteRepository';
+import { NotFoundError } from '../../../src/core/domain/errors/NotFoundError';
 
 describe('DeleteBookCommandHandler', () => {
   let handler: DeleteBookCommandHandler;

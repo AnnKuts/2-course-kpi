@@ -1,8 +1,8 @@
-import { BookFactory } from '../../domain/factories/BookFactory';
-import { IBookWriteRepository } from '../../domain/repositories/IBookWriteRepository';
-import { Genre } from '../../domain/models/Genre';
-import { IEventBus } from '../events/EventContracts';
+import { IEventBus } from '../../../infrastructure/events/EventContracts';
 import { BookCreatedEvent } from '../../domain/events/BookCreatedEvent';
+import { BookFactory } from '../../domain/factories/BookFactory';
+import { Genre } from '../../domain/models/Genre';
+import { IBookWriteRepository } from '../../domain/repositories/IBookWriteRepository';
 
 export type CreateBookCommand = {
   title: string;
@@ -16,7 +16,7 @@ export type CreateBookCommand = {
 export class CreateBookCommandHandler {
   constructor(
     private readonly bookRepository: IBookWriteRepository,
-    private readonly eventBus: IEventBus
+    private readonly eventBus: IEventBus,
   ) {}
 
   public async execute(command: CreateBookCommand): Promise<number> {
@@ -27,14 +27,18 @@ export class CreateBookCommandHandler {
       command.genre,
       command.rating,
       command.description,
-      command.isRead
+      command.isRead,
     );
-    
+
     const savedBook = await this.bookRepository.create(newBook);
-    
-    const event = new BookCreatedEvent(savedBook.id, command.title, command.author);
-    
+
+    const event = new BookCreatedEvent(
+      savedBook.id,
+      command.title,
+      command.author,
+    );
+
     this.eventBus.publish(event);
-    return savedBook.id; 
+    return savedBook.id;
   }
 }

@@ -1,4 +1,4 @@
-import { IEventBus, IIntegrationEvent, IEventHandler } from '../../application/events/EventContracts';
+import { IEventBus, IIntegrationEvent, IEventHandler } from './EventContracts';
 
 export class InMemoryEventBus implements IEventBus {
   private handlers: Map<string, IEventHandler<IIntegrationEvent>[]> = new Map();
