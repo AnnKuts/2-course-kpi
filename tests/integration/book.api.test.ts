@@ -25,6 +25,7 @@ describe('Book API Integration Tests', () => {
 
     await db.run('DELETE FROM books');
     await db.run('DELETE FROM sqlite_sequence WHERE name="books"');
+    await db.run('DELETE FROM analytics_metrics');
 
     app = createServer(db);
   });
@@ -112,5 +113,6 @@ describe('Book API Integration Tests', () => {
     const db = await initDb(); 
     await db.run('DELETE FROM books');
     await db.run('DELETE FROM sqlite_sequence WHERE name="books"');
+    await db.run('DELETE FROM analytics_metrics');
   });
 });

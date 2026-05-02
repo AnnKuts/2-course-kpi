@@ -21,6 +21,14 @@ export async function initDb(): Promise<Database> {
     )
   `);
 
+  await dbInstance.exec(`
+    CREATE TABLE IF NOT EXISTS analytics_metrics (
+      id INTEGER PRIMARY KEY AUTOINCREMENT,
+      target_book_id INTEGER NOT NULL,
+      recorded_at TEXT NOT NULL
+    )
+  `);
+
   return dbInstance;
 }
 
