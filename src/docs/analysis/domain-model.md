@@ -32,6 +32,7 @@
 ### Що реалізовано у моделі
 
 `Book.ts` містить:
+
 - `private _rating` з getter/setter — **мінімальна інкапсуляція** одного інваріанту (rating 1–5), що є захистом від невалідного стану навіть в Anemic-підході
 - `markAsRead()` — зручний метод, що змінює `isRead = true`
 - Решта полів (`title`, `author`, `genre`, `description`) — публічні
@@ -40,12 +41,12 @@
 
 ### Відповідальність за інваріанти
 
-| Інваріант | Де захищено |
-|-----------|-------------|
-| `rating` від 1 до 5 | `Book` setter + `BookFactory.create()` |
-| `title`, `author` не порожні | `BookFactory.create()` |
+| Інваріант                     | Де захищено                                    |
+| ----------------------------- | ---------------------------------------------- |
+| `rating` від 1 до 5           | `Book` setter + `BookFactory.create()`         |
+| `title`, `author` не порожні  | `BookFactory.create()`                         |
 | Унікальність `title + author` | `BookFactory.create()` через `IBookRepository` |
-| Формат вхідних даних (HTTP) | Zod-схема у `src/schemas/book.schema.ts` |
+| Формат вхідних даних (HTTP)   | Zod-схема у `src/schemas/book.schema.ts`       |
 
 ### Альтернатива, що не була обрана
 

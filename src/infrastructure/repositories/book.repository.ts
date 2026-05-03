@@ -1,8 +1,8 @@
 import { Book } from '../../domain/models/Book';
 import { BookRepository } from '../../domain/repositories/book.repository';
+import { getDb } from '../database/database';
 import { BookEntity } from '../entities/book.entity';
 import { BookMapper } from '../mappers/book.mapper';
-import { getDb } from '../database/database';
 
 interface BookDbRow {
   id: number;
@@ -11,61 +11,89 @@ interface BookDbRow {
   genre: string;
   rating: number;
   description: string;
-  isRead: number; 
+  isRead: number;
 }
 
 class BookRepositoryImpl implements BookRepository {
-public async findAll(limit: number = 10, offset: number = 0): Promise<Book[]> {
+  public async findAll(
+    limit: number = 10,
+    offset: number = 0,
+  ): Promise<Book[]> {
     const db = getDb();
     const rows = await db.all<BookDbRow[]>(
       'SELECT * FROM books LIMIT ? OFFSET ?',
-      [limit, offset]
+      [limit, offset],
     );
-    
-    return rows.map((row: BookDbRow) => BookMapper.toDomain({
-      ...row,
-      isRead: Boolean(row.isRead)
-    } as BookEntity));
+
+    return rows.map((row: BookDbRow) =>
+      BookMapper.toDomain({
+        ...row,
+        isRead: Boolean(row.isRead),
+      } as BookEntity),
+    );
   }
 
   public async findById(id: number): Promise<Book | null> {
     const db = getDb();
-    const row = await db.get<BookDbRow>('SELECT * FROM books WHERE id = ?', [id]);
-    
+    const row = await db.get<BookDbRow>('SELECT * FROM books WHERE id = ?', [
+      id,
+    ]);
+
     if (!row) return null;
-    return BookMapper.toDomain({ ...row, isRead: Boolean(row.isRead) } as BookEntity);
+    return BookMapper.toDomain({
+      ...row,
+      isRead: Boolean(row.isRead),
+    } as BookEntity);
   }
 
-  public async findByTitleAndAuthor(title: string, author: string): Promise<Book | null> {
+  public async findByTitleAndAuthor(
+    title: string,
+    author: string,
+  ): Promise<Book | null> {
     const db = getDb();
     const row = await db.get<BookDbRow>(
       'SELECT * FROM books WHERE title = ? AND author = ? LIMIT 1',
-      [title, author]
+      [title, author],
     );
     if (!row) return null;
-    return BookMapper.toDomain({ ...row, isRead: Boolean(row.isRead) } as BookEntity);
+    return BookMapper.toDomain({
+      ...row,
+      isRead: Boolean(row.isRead),
+    } as BookEntity);
   }
 
-  public async findReadBooks(limit: number = 10, offset: number = 0): Promise<Book[]> {
+  public async findReadBooks(
+    limit: number = 10,
+    offset: number = 0,
+  ): Promise<Book[]> {
     const db = getDb();
     const rows = await db.all<BookDbRow[]>(
       'SELECT * FROM books WHERE isRead = 1 LIMIT ? OFFSET ?',
-      [limit, offset]
+      [limit, offset],
     );
-    return rows.map((row: BookDbRow) => BookMapper.toDomain({
-      ...row,
-      isRead: Boolean(row.isRead)
-    } as BookEntity));
+    return rows.map((row: BookDbRow) =>
+      BookMapper.toDomain({
+        ...row,
+        isRead: Boolean(row.isRead),
+      } as BookEntity),
+    );
   }
 
   public async create(book: Book): Promise<Book> {
     const db = getDb();
     const entity = BookMapper.toEntity(book);
-    
+
     const result = await db.run(
       `INSERT INTO books (title, author, genre, rating, description, isRead) 
        VALUES (?, ?, ?, ?, ?, ?)`,
-      [entity.title, entity.author, entity.genre, entity.rating, entity.description, entity.isRead ? 1 : 0]
+      [
+        entity.title,
+        entity.author,
+        entity.genre,
+        entity.rating,
+        entity.description,
+        entity.isRead ? 1 : 0,
+      ],
     );
 
     return new Book(
@@ -75,7 +103,7 @@ public async findAll(limit: number = 10, offset: number = 0): Promise<Book[]> {
       book.genre,
       book.rating,
       book.description,
-      book.isRead
+      book.isRead,
     );
   }
 
@@ -95,7 +123,15 @@ public async findAll(limit: number = 10, offset: number = 0): Promise<Book[]> {
 
     await db.run(
       `UPDATE books SET title = ?, author = ?, genre = ?, rating = ?, description = ?, isRead = ? WHERE id = ?`,
-      [entity.title, entity.author, entity.genre, entity.rating, entity.description, entity.isRead ? 1 : 0, id]
+      [
+        entity.title,
+        entity.author,
+        entity.genre,
+        entity.rating,
+        entity.description,
+        entity.isRead ? 1 : 0,
+        id,
+      ],
     );
 
     return existing;
@@ -104,7 +140,7 @@ public async findAll(limit: number = 10, offset: number = 0): Promise<Book[]> {
   public async delete(id: number): Promise<boolean> {
     const db = getDb();
     const result = await db.run('DELETE FROM books WHERE id = ?', [id]);
-    
+
     return result.changes !== undefined && result.changes > 0;
   }
 }

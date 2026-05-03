@@ -1,7 +1,7 @@
+import { DomainError } from '../../domain/errors/DomainError';
 import { Book } from '../../domain/models/Book';
 import { Genre } from '../../domain/models/Genre';
 import { BookEntity } from '../entities/book.entity';
-import { DomainError } from '../../domain/errors/DomainError';
 
 export class BookMapper {
   private static parseGenre(value: string): Genre {
@@ -20,7 +20,7 @@ export class BookMapper {
       BookMapper.parseGenre(entity.genre),
       entity.rating,
       entity.description,
-      entity.isRead
+      entity.isRead,
     );
   }
 

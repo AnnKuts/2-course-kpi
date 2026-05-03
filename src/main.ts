@@ -1,6 +1,7 @@
 import logger from 'jet-logger';
-import server from './server';
+
 import { initDb } from './infrastructure/database/database';
+import server from './server';
 
 const PORT = process.env.PORT || 3000;
 
@@ -19,4 +20,7 @@ async function bootstrap() {
   }
 }
 
-void bootstrap();
+bootstrap().catch((err) => {
+  console.error('Unhandled error during bootstrap:', err);
+  process.exit(1);
+});

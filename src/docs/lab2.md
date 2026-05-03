@@ -45,7 +45,7 @@ src/
 
 ## Architecture
 
-The application follows the Layered Architecture described by Eric Evans in *Domain-Driven Design* (2003):
+The application follows the Layered Architecture described by Eric Evans in _Domain-Driven Design_ (2003):
 
 ```
 Presentation → Application → Domain ← Infrastructure
@@ -118,11 +118,11 @@ Behavior:
 
 `BookFactory` validates all invariants on creation:
 
-| Check | Type |
-|-------|------|
-| `title` is not empty | Simple (no DB) |
-| `author` is not empty | Simple (no DB) |
-| `rating` in `[1, 5]` | Simple (via `Book` setter) |
+| Check                         | Type                                     |
+| ----------------------------- | ---------------------------------------- |
+| `title` is not empty          | Simple (no DB)                           |
+| `author` is not empty         | Simple (no DB)                           |
+| `rating` in `[1, 5]`          | Simple (via `Book` setter)               |
 | No duplicate `title + author` | Complex (via `BookRepository` interface) |
 
 The factory receives `BookRepository` through its constructor — this is **Dependency Inversion**: the domain defines the interface, infrastructure provides the implementation.

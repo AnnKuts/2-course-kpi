@@ -1,14 +1,20 @@
 import express from 'express';
-import { bookRepository } from './infrastructure/repositories/book.repository';
+
+import {
+  CreateBookUseCase,
+  DeleteBookUseCase,
+  GetAllBooksUseCase,
+  GetBookByIdUseCase,
+  GetReadBooksUseCase,
+  MarkAsReadUseCase,
+  RateBookUseCase,
+  UpdateBookUseCase,
+} from './application/use-cases/BookUseCases';
 import { BookFactory } from './domain/factories/BookFactory';
+import { bookRepository } from './infrastructure/repositories/book.repository';
+import { errorMiddleware } from './middlewares/error.middleware';
 import { BookController } from './presentation/controllers/book.controller';
 import { createBookRouter } from './routes/book.router';
-import {
-  GetAllBooksUseCase, GetBookByIdUseCase, CreateBookUseCase,
-  UpdateBookUseCase, DeleteBookUseCase, GetReadBooksUseCase,
-  RateBookUseCase, MarkAsReadUseCase
-} from './application/use-cases/BookUseCases';
-import { errorMiddleware } from './middlewares/error.middleware';
 
 const app = express();
 app.use(express.json());
@@ -23,7 +29,7 @@ const useCases = {
   deleteBook: new DeleteBookUseCase(bookRepository),
   getReadBooks: new GetReadBooksUseCase(bookRepository),
   rateBook: new RateBookUseCase(bookRepository),
-  markAsRead: new MarkAsReadUseCase(bookRepository)
+  markAsRead: new MarkAsReadUseCase(bookRepository),
 };
 
 const bookController = new BookController(useCases);
@@ -35,4 +41,3 @@ app.use('/books', bookRouter);
 app.use(errorMiddleware);
 
 export default app;
-

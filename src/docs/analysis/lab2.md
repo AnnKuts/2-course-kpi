@@ -49,7 +49,15 @@ src/
 // tests/domain/BookFactory.test.ts
 // Жодного import SQLite, жодного import express
 const factory = new BookFactory(mockRepository); // лише мок
-const book = await factory.create(1, '1984', 'Orwell', Genre.FICTION, 5, 'Desc', false);
+const book = await factory.create(
+  1,
+  '1984',
+  'Orwell',
+  Genre.FICTION,
+  5,
+  'Desc',
+  false,
+);
 ```
 
 Доменні тести запускаються за мілісекунди без жодної інфраструктури.
@@ -72,10 +80,10 @@ src/infrastructure/repositories/book.repository.ts  ← клас BookRepositoryI
 
 ```typescript
 // Лабораторна 1:
-throw new Error('Not found');   // контролер ловить усе через try/catch
+throw new Error('Not found'); // контролер ловить усе через try/catch
 
 // Лабораторна 2:
-throw new NotFoundError('Книга з ID 5 не знайдена');  // домен
+throw new NotFoundError('Книга з ID 5 не знайдена'); // домен
 // middleware автоматично маппить у HTTP 404
 ```
 
@@ -88,6 +96,7 @@ throw new NotFoundError('Книга з ID 5 не знайдена');  // дом�
 ### Більше коду та файлів
 
 Для однієї сутності `Book` тепер існують:
+
 - `Book.ts` (доменна модель)
 - `BookEntity` (ORM/DB інтерфейс)
 - `BookMapper.ts` (перетворення між ними)
@@ -116,6 +125,7 @@ throw new NotFoundError('Книга з ID 5 не знайдена');  // дом�
 **Лабораторна 1**: SQL-запити розкидані по контролерах. Зміна БД = зміна більшості файлів у проєкті.
 
 **Лабораторна 2**: потрібно змінити лише:
+
 1. `src/infrastructure/database/database.ts` — підключення
 2. `src/infrastructure/repositories/book.repository.ts` — SQL-запити
 

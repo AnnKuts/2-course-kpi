@@ -1,4 +1,3 @@
-/* eslint-disable @typescript-eslint/unbound-method */
 import { describe, it, expect, vi, beforeEach, Mocked } from 'vitest';
 import {
   CreateBookUseCase,
@@ -47,8 +46,8 @@ describe('Book Use Cases', () => {
         isRead: false
       });
 
-      expect(mockFactory.create).toHaveBeenCalledOnce();
-      expect(mockRepository.create).toHaveBeenCalledOnce();
+      expect(mockFactory['create']).toHaveBeenCalledOnce();
+      expect(mockRepository['create']).toHaveBeenCalledOnce();
       expect(result.id).toBe(1);
       expect(result.title).toBe('Title');
     });
@@ -63,8 +62,8 @@ describe('Book Use Cases', () => {
 
       const result = await useCase.execute(1, 5);
 
-      expect(mockRepository.findById).toHaveBeenCalledWith(1);
-      expect(mockRepository.update).toHaveBeenCalledOnce();
+      expect(mockRepository['findById']).toHaveBeenCalledWith(1);
+      expect(mockRepository['update']).toHaveBeenCalledOnce();
       expect(result.rating).toBe(5);
     });
 
@@ -108,7 +107,7 @@ describe('Book Use Cases', () => {
       mockRepository.delete.mockResolvedValue(true);
 
       await useCase.execute(1);
-      expect(mockRepository.delete).toHaveBeenCalledWith(1);
+      expect(mockRepository['delete']).toHaveBeenCalledWith(1);
     });
 
     it('should throw NotFoundError if the book to delete does not exist', async () => {

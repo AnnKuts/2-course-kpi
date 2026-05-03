@@ -1,4 +1,3 @@
-/* eslint-disable @typescript-eslint/unbound-method */
 import { describe, it, expect, vi, beforeEach } from 'vitest';
 import { BookFactory } from '../../src/domain/factories/BookFactory';
 import { BookRepository } from '../../src/domain/repositories/book.repository';
@@ -57,7 +56,7 @@ describe('Book Domain Model & Factory', () => {
 
   it('should throw DomainError when book with same title and author already exists', async () => {
     const existingBook = new Book(1, '1984', 'George Orwell', Genre.FICTION, 5, 'Dystopia', true);
-    vi.mocked(mockRepository.findByTitleAndAuthor).mockResolvedValue(existingBook);
+    vi.mocked(mockRepository['findByTitleAndAuthor']).mockResolvedValue(existingBook);
 
     await expect(
       factory.create(2, '1984', 'George Orwell', Genre.FICTION, 4, 'Another desc', false)
