@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/unbound-method */
 import { describe, it, expect, vi, beforeEach, Mocked } from 'vitest';
 import {
   CreateBookUseCase,
@@ -5,20 +6,22 @@ import {
   GetBookByIdUseCase,
   DeleteBookUseCase
 } from '../../src/application/use-cases/BookUseCases';
-import { IBookRepository } from '../../src/domain/repositories/IBookRepository';
+import { BookRepository } from '@src/domain/repositories/book.repository';
+import { BookFactory } from '../../src/domain/factories/BookFactory';
 import { Book } from '../../src/domain/models/Book';
 import { Genre } from '../../src/domain/models/Genre';
 import { NotFoundError } from '../../src/domain/errors/NotFoundError';
 import { DomainError } from '../../src/domain/errors/DomainError';
 
 describe('Book Use Cases', () => {
-  let mockRepository: Mocked<IBookRepository>;
+  let mockRepository: Mocked<BookRepository>;
 
   beforeEach(() => {
     mockRepository = {
       findAll: vi.fn(),
       findById: vi.fn(),
       findReadBooks: vi.fn(),
+      findByTitleAndAuthor: vi.fn(),
       create: vi.fn(),
       update: vi.fn(),
       delete: vi.fn(),
@@ -27,7 +30,11 @@ describe('Book Use Cases', () => {
 
   describe('CreateBookUseCase', () => {
     it('should successfully create a book', async () => {
-      const useCase = new CreateBookUseCase(mockRepository);
+      const mockFactory = {
+        create: vi.fn().mockResolvedValue(new Book(1, 'Title', 'Author', Genre.FICTION, 5, 'Desc', false)),
+      } as unknown as BookFactory;
+
+      const useCase = new CreateBookUseCase(mockRepository, mockFactory);
       const fakeBook = new Book(1, 'Title', 'Author', Genre.FICTION, 5, 'Desc', false);
       mockRepository.create.mockResolvedValue(fakeBook);
 
@@ -40,6 +47,7 @@ describe('Book Use Cases', () => {
         isRead: false
       });
 
+      expect(mockFactory.create).toHaveBeenCalledOnce();
       expect(mockRepository.create).toHaveBeenCalledOnce();
       expect(result.id).toBe(1);
       expect(result.title).toBe('Title');
@@ -71,7 +79,7 @@ describe('Book Use Cases', () => {
       const useCase = new RateBookUseCase(mockRepository);
       const fakeBook = new Book(1, 'Title', 'Author', Genre.FICTION, 3, 'Desc', false);
       mockRepository.findById.mockResolvedValue(fakeBook);
-      mockRepository.update.mockResolvedValue(null); // Імітація збою БД
+      mockRepository.update.mockResolvedValue(null);
 
       await expect(useCase.execute(1, 5)).rejects.toThrow(DomainError);
     });

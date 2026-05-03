@@ -6,3 +6,4 @@ tsconfig.tsbuildinfo
 .env
 .DS_Store
 *.sqlite
+src/docs/requirements/

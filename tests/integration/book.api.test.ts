@@ -1,12 +1,17 @@
-import { describe, it, expect, beforeAll } from 'vitest';
+import { describe, it, expect, beforeAll, afterAll } from 'vitest';
 import request from 'supertest';
 import app from '../../src/server';
-import { initDb } from '../../src/infrastructure/database/database';
+import { initDb, getDb } from '../../src/infrastructure/database/database';
 
 describe('Book API Integration Tests', () => {
   let createdBookId: number;
+
   beforeAll(async () => {
-    await initDb();
+    await initDb(':memory:');
+  });
+
+  afterAll(async () => {
+    await getDb().close();
   });
 
   it('POST /books - should create a new book', async () => {
@@ -25,6 +30,22 @@ describe('Book API Integration Tests', () => {
     expect((res.body as { title: string }).title).toBe('Integration Test Book');
 
     createdBookId = (res.body as { id: number }).id;
+  });
+
+  it('POST /books - should return 400 when creating duplicate title+author', async () => {
+    const res = await request(app)
+      .post('/books')
+      .send({
+        title: 'Integration Test Book',
+        author: 'Tester',
+        genre: 'Science',
+        rating: 3,
+        description: 'Duplicate',
+        isRead: false
+      });
+
+    expect(res.status).toBe(400);
+    expect((res.body as { message: string }).message).toMatch(/already exists/);
   });
 
   it('GET /books/:id - should return the newly created book', async () => {
@@ -72,3 +93,4 @@ describe('Book API Integration Tests', () => {
     expect(res.status).toBe(404);
   });
 });
+

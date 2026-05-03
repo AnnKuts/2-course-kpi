@@ -7,16 +7,16 @@ const PORT = process.env.PORT || 3000;
 async function bootstrap() {
   try {
     await initDb();
-    logger.info('База даних SQLite успішно ініціалізована');
+    logger.info('SQLite database initialized successfully');
 
     server.listen(PORT, () => {
       logger.info(`Server started on port: ${PORT}`);
     });
   } catch (error) {
-    logger.err('Помилка під час запуску сервера:');
+    logger.err('Failed to start the server:');
     console.error(error);
     process.exit(1);
   }
 }
 
-bootstrap();
+void bootstrap();
