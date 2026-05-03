@@ -9,10 +9,10 @@ export class RateBookCommandHandler {
 
   public async execute(command: RateBookCommand): Promise<void> {
     const book = await this.bookRepository.findById(command.id);
-    if (!book) throw new NotFoundError(`Книга з ID ${command.id} не знайдена`);
+    if (!book) throw new NotFoundError(`Book with ID ${command.id} not found`);
     
     book.rating = command.rating; 
     const updatedBook = await this.bookRepository.update(command.id, book);
-    if (!updatedBook) throw new DomainError('Помилка оновлення');
+    if (!updatedBook) throw new DomainError('Update failed');
   }
 }

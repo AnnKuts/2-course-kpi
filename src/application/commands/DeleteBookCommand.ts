@@ -8,6 +8,6 @@ export class DeleteBookCommandHandler {
 
   public async execute(command: DeleteBookCommand): Promise<void> {
     const isDeleted = await this.bookRepository.delete(command.id);
-    if (!isDeleted) throw new NotFoundError(`Книга з ID ${command.id} не знайдена`);
+    if (!isDeleted) throw new NotFoundError(`Book with ID ${command.id} not found`);
   }
 }

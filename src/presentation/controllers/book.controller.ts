@@ -11,7 +11,7 @@ import { GetBookByIdQueryHandler } from '../../application/queries/GetBookByIdQu
 import { GetReadBooksQueryHandler } from '../../application/queries/GetReadBooksQuery';
 
 import { DomainError } from '../../domain/errors/DomainError';
-import { CreateBookDto } from '../../schemas/book.schema';
+import { CreateBookCommand } from '../../application/commands/CreateBookCommand';
 
 export interface BookControllerUseCases {
   getAllBooks: GetAllBooksQueryHandler;
@@ -54,13 +54,13 @@ export class BookController {
   };
 
   public create = async (req: Request, res: Response): Promise<void> => {
-    const newBookId = await this.useCases.createBook.execute(req.body as unknown as CreateBookDto);
+    const newBookId = await this.useCases.createBook.execute(req.body as unknown as CreateBookCommand);
     res.status(201).json({ id: newBookId }); 
   };
 
   public update = async (req: Request, res: Response): Promise<void> => {
     const id = this.extractId(req);
-    await this.useCases.updateBook.execute({ id, data: req.body as unknown as Partial<CreateBookDto> });
+    await this.useCases.updateBook.execute({ id, data: req.body as unknown as Partial<CreateBookCommand> });
     res.status(204).send();
   };
 

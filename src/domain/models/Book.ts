@@ -9,7 +9,7 @@ export class Book {
     public genre: Genre,
     private _rating: number,
     public description: string,
-    public isRead: boolean
+    public isRead: boolean,
   ) {
     this.rating = _rating;
   }
@@ -37,7 +37,7 @@ export class Book {
       genre: this.genre,
       rating: this.rating,
       description: this.description,
-      isRead: this.isRead
+      isRead: this.isRead,
     };
   }
 }

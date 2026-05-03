@@ -12,10 +12,13 @@ export type CreateBookCommand = {
 };
 
 export class CreateBookCommandHandler {
-  constructor(private readonly bookRepository: IBookWriteRepository) {}
+  constructor(
+    private readonly bookRepository: IBookWriteRepository,
+    private readonly bookFactory: BookFactory
+  ) {}
 
   public async execute(command: CreateBookCommand): Promise<number> {
-    const newBook = BookFactory.create(
+    const newBook = await this.bookFactory.create(
       0,
       command.title,
       command.author,

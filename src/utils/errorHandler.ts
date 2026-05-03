@@ -34,10 +34,10 @@ export function getErrorMessage(error: unknown): string {
   if (error instanceof ZodError) {
     return error.issues
       .map((issue: ZodIssue) => `${issue.path.join('.')}: ${issue.message}`)
-      .join(', ');
+      .join('; ');
   }
   if (error instanceof Error) {
     return error.message;
   }
-  return 'Внутрішня помилка сервера';
+  return 'Internal server error';
 }

@@ -9,10 +9,10 @@ export class MarkAsReadCommandHandler {
 
   public async execute(command: MarkAsReadCommand): Promise<void> {
     const book = await this.bookRepository.findById(command.id);
-    if (!book) throw new NotFoundError(`Книга з ID ${command.id} не знайдена`);
+    if (!book) throw new NotFoundError(`Book with ID ${command.id} not found`);
     
     book.markAsRead(); 
     const updatedBook = await this.bookRepository.update(command.id, book);
-    if (!updatedBook) throw new DomainError('Помилка оновлення');
+    if (!updatedBook) throw new DomainError('Update failed');
   }
 }
