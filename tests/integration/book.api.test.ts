@@ -63,7 +63,6 @@ describe('Book API Integration Tests', () => {
 
     expect(res.status).toBe(204);
 
-    // Verify via query
     const getRes = await request(app).get(`/books/${createdBookId}`);
     expect((getRes.body as { rating: number }).rating).toBe(5);
   });
@@ -82,7 +81,6 @@ describe('Book API Integration Tests', () => {
 
     expect(res.status).toBe(204);
 
-    // Verify via query
     const getRes = await request(app).get(`/books/${createdBookId}`);
     expect((getRes.body as { isRead: boolean }).isRead).toBe(true);
   });
