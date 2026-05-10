@@ -1,10 +1,8 @@
-import { Genre } from '../schemas/book.schema';
-
-export interface Book {
+export interface BookEntity {
   id: number;
   title: string;
   author: string;
-  genre: Genre;
+  genre: string;
   rating: number;
   description: string;
   isRead: boolean;

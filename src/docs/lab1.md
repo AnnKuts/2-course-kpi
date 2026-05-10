@@ -13,8 +13,6 @@ Building a monolithic CRUD backend using layered architecture.
 
 ## Project Overview
 
-[GitHub Repository: 2-course-kpi](https://github.com/AnnKuts/2-course-kpi/tree/main)
-
 This project is a **monolithic backend application** that provides a REST API for managing a collection of books.
 
 Supported CRUD operations:

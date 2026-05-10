@@ -1,14 +1,19 @@
-// here will be routers
 import { Router } from 'express';
 
-import { bookController } from '../controllers/book.controller';
+import { BookController } from '../presentation/controllers/book.controller';
+import { catchAsync } from '../utils/catchAsync';
 
-const router = Router();
+export function createBookRouter(bookController: BookController): Router {
+  const router = Router();
 
-router.get('/', (req, res) => bookController.getAll(req, res));
-router.get('/:id', (req, res) => bookController.getById(req, res));
-router.post('/', (req, res) => bookController.create(req, res));
-router.put('/:id', (req, res) => bookController.update(req, res));
-router.delete('/:id', (req, res) => bookController.delete(req, res));
+  router.get('/', catchAsync(bookController.getAll));
+  router.get('/read', catchAsync(bookController.getReadBooks));
+  router.get('/:id', catchAsync(bookController.getById));
+  router.post('/', catchAsync(bookController.create));
+  router.patch('/:id', catchAsync(bookController.update));
+  router.delete('/:id', catchAsync(bookController.delete));
+  router.patch('/:id/rating', catchAsync(bookController.rate));
+  router.patch('/:id/read', catchAsync(bookController.markAsRead));
 
-export default router;
+  return router;
+}
