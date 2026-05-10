@@ -14,7 +14,7 @@ export class UpdateBookCommandHandler {
   public async execute(command: UpdateBookCommand): Promise<void> {
     const existing = await this.bookRepository.findById(command.id);
     if (!existing) throw new NotFoundError(`Book with ID ${command.id} not found`);
-    
+
     if (command.data.title !== undefined && !command.data.title.trim()) {
       throw new DomainError('Book title cannot be empty');
     }

@@ -1,16 +1,18 @@
 import logger from 'jet-logger';
 
 import { initDb } from './infrastructure/database/database';
-import server from './server';
+import { createServer } from './server';
 
 const PORT = process.env.PORT || 3000;
 
 async function bootstrap() {
   try {
-    await initDb();
+    const db = await initDb();
     logger.info('SQLite database initialized successfully');
 
-    server.listen(PORT, () => {
+    const app = createServer(db);
+
+    app.listen(PORT, () => {
       logger.info(`Server started on port: ${PORT}`);
     });
   } catch (error) {

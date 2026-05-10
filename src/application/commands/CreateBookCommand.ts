@@ -2,6 +2,7 @@ import { BookFactory } from '../../domain/factories/BookFactory';
 import { IBookWriteRepository } from '../../domain/repositories/IBookWriteRepository';
 import { Genre } from '../../domain/models/Genre';
 import { IEventBus } from '../events/EventContracts';
+import { IAuditService } from '../../audit/IAuditService';
 import { BookCreatedEvent } from '../../domain/events/BookCreatedEvent';
 
 export type CreateBookCommand = {
@@ -16,8 +17,9 @@ export type CreateBookCommand = {
 export class CreateBookCommandHandler {
   constructor(
     private readonly bookRepository: IBookWriteRepository,
-    private readonly eventBus: IEventBus
-
+    private readonly bookFactory: BookFactory,
+    private readonly eventBus: IEventBus,
+    private readonly auditService: IAuditService,
   ) {}
 
   public async execute(command: CreateBookCommand): Promise<number> {
@@ -28,14 +30,28 @@ export class CreateBookCommandHandler {
       command.genre,
       command.rating,
       command.description,
-      command.isRead
+      command.isRead,
     );
-    
+
     const savedBook = await this.bookRepository.create(newBook);
-    
     const event = new BookCreatedEvent(savedBook.id, command.title, command.author);
-    
+
+    // --- SYNCHRONOUS communication ---
+    // Direct call in the same execution thread.
+    // If the audit service throws — the error is caught and logged;
+    // the main operation (book creation) is NOT rolled back.
+    try {
+      this.auditService.logBookCreated(event);
+    } catch (auditError) {
+      console.error('[CreateBookHandler] Sync audit failed (ignored):', auditError);
+    }
+
+    // --- ASYNCHRONOUS communication ---
+    // Publishes the event to the Event Bus.
+    // Subscribers (ConsoleAuditService.handle) are called via setTimeout(0) —
+    // the current call stack finishes before they execute.
     this.eventBus.publish(event);
-    return savedBook.id; 
+
+    return savedBook.id;
   }
 }
