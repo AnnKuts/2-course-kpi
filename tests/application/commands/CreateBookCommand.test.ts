@@ -71,13 +71,11 @@ describe('CreateBookCommandHandler', () => {
     expect(resultId).toBe(1);
     expect(mockWriteRepository.create).toHaveBeenCalledOnce();
 
-    // SYNC: auditService.logBookCreated called directly in the same execution
     expect(mockAuditService.logBookCreated).toHaveBeenCalledOnce();
     expect(mockAuditService.logBookCreated).toHaveBeenCalledWith(
       expect.objectContaining({ eventName: 'BookCreatedEvent', bookId: 1 }),
     );
 
-    // ASYNC: event published to EventBus after sync audit
     expect(mockEventBus.publish).toHaveBeenCalledOnce();
     expect(mockEventBus.publish).toHaveBeenCalledWith(
       expect.objectContaining({ eventName: 'BookCreatedEvent' }),
@@ -92,22 +90,15 @@ describe('CreateBookCommandHandler', () => {
 
     const consoleSpy = vi.spyOn(console, 'error').mockImplementation(() => {});
 
-    // Main operation should NOT throw even though audit fails
     const resultId = await handler.execute(baseCommand);
 
     expect(resultId).toBe(2);
     expect(mockWriteRepository.create).toHaveBeenCalledOnce();
-
-    // Sync audit was attempted
     expect(mockAuditService.logBookCreated).toHaveBeenCalledOnce();
-
-    // Error was logged
     expect(consoleSpy).toHaveBeenCalledWith(
       expect.stringContaining('Sync audit failed'),
       expect.any(Error),
     );
-
-    // Async event still published despite audit failure
     expect(mockEventBus.publish).toHaveBeenCalledOnce();
 
     consoleSpy.mockRestore();

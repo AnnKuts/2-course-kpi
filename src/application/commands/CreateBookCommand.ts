@@ -36,20 +36,12 @@ export class CreateBookCommandHandler {
     const savedBook = await this.bookRepository.create(newBook);
     const event = new BookCreatedEvent(savedBook.id, command.title, command.author);
 
-    // --- SYNCHRONOUS communication ---
-    // Direct call in the same execution thread.
-    // If the audit service throws — the error is caught and logged;
-    // the main operation (book creation) is NOT rolled back.
     try {
       this.auditService.logBookCreated(event);
     } catch (auditError) {
       console.error('[CreateBookHandler] Sync audit failed (ignored):', auditError);
     }
 
-    // --- ASYNCHRONOUS communication ---
-    // Publishes the event to the Event Bus.
-    // Subscribers (ConsoleAuditService.handle) are called via setTimeout(0) —
-    // the current call stack finishes before they execute.
     this.eventBus.publish(event);
 
     return savedBook.id;

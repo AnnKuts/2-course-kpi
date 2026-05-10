@@ -5,11 +5,6 @@ import { IAuditService } from './IAuditService';
 export class ConsoleAuditService
   implements IEventHandler<BookCreatedEvent>, IAuditService
 {
-  /**
-   * SYNCHRONOUS variant: called directly from the Command Handler in the same
-   * execution thread. Errors are caught and logged — the main operation is NOT
-   * rolled back if auditing fails.
-   */
   logBookCreated(event: BookCreatedEvent): void {
     const timestamp = event.occurredAt.toISOString();
     console.log(`\n[AUDIT SYNC] Record created`);
@@ -21,10 +16,6 @@ export class ConsoleAuditService
     );
   }
 
-  /**
-   * ASYNCHRONOUS variant: called by the Event Bus after the event is published.
-   * Runs in a separate microtask — the main operation has already returned.
-   */
   async handle(event: BookCreatedEvent): Promise<void> {
     await new Promise(resolve => setTimeout(resolve, 500));
 
