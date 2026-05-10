@@ -3,6 +3,8 @@ import type { Mocked } from 'vitest';
 
 import { CreateBookCommandHandler } from '../../../src/application/commands/CreateBookCommand';
 import { IBookWriteRepository } from '../../../src/domain/repositories/IBookWriteRepository';
+import { IBookReadRepository } from '../../../src/domain/repositories/IBookReadRepository';
+import { BookFactory } from '../../../src/domain/factories/BookFactory';
 import { Book } from '../../../src/domain/models/Book';
 import { Genre } from '../../../src/domain/models/Genre';
 import { IEventBus } from '../../../src/application/events/EventContracts';
@@ -10,6 +12,8 @@ import { IEventBus } from '../../../src/application/events/EventContracts';
 describe('CreateBookCommandHandler', () => {
   let handler: CreateBookCommandHandler;
   let mockWriteRepository: Mocked<IBookWriteRepository>;
+  let mockReadRepository: Mocked<IBookReadRepository>;
+  let factory: BookFactory;
   let mockEventBus: Mocked<IEventBus>;
 
   beforeEach(() => {
@@ -20,6 +24,15 @@ describe('CreateBookCommandHandler', () => {
       delete: vi.fn(),
     };
 
+    mockReadRepository = {
+      findAll: vi.fn(),
+      findById: vi.fn(),
+      findByTitleAndAuthor: vi.fn().mockResolvedValue(null),
+      findReadBooks: vi.fn(),
+    };
+
+    factory = new BookFactory(mockReadRepository);
+    handler = new CreateBookCommandHandler(mockWriteRepository, factory);
     mockEventBus = {
       publish: vi.fn(),
       subscribe: vi.fn(),

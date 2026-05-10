@@ -17,10 +17,11 @@ export class CreateBookCommandHandler {
   constructor(
     private readonly bookRepository: IBookWriteRepository,
     private readonly eventBus: IEventBus
+
   ) {}
 
   public async execute(command: CreateBookCommand): Promise<number> {
-    const newBook = BookFactory.create(
+    const newBook = await this.bookFactory.create(
       0,
       command.title,
       command.author,
