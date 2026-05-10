@@ -27,8 +27,8 @@ describe('Book API Integration Tests', () => {
       });
 
     expect(res.status).toBe(201);
-    expect((res.body as { title: string }).title).toBe('Integration Test Book');
-
+    expect(res.body).toHaveProperty('id');
+    
     createdBookId = (res.body as { id: number }).id;
   });
 
@@ -61,8 +61,10 @@ describe('Book API Integration Tests', () => {
       .patch(`/books/${createdBookId}/rating`)
       .send({ rating: 5 });
 
-    expect(res.status).toBe(200);
-    expect((res.body as { rating: number }).rating).toBe(5);
+    expect(res.status).toBe(204);
+
+    const getRes = await request(app).get(`/books/${createdBookId}`);
+    expect((getRes.body as { rating: number }).rating).toBe(5);
   });
 
   it('PATCH /books/:id/rating - should return 400 on domain error', async () => {
@@ -77,8 +79,10 @@ describe('Book API Integration Tests', () => {
   it('PATCH /books/:id/read - should mark the book as read', async () => {
     const res = await request(app).patch(`/books/${createdBookId}/read`);
 
-    expect(res.status).toBe(200);
-    expect((res.body as { isRead: boolean }).isRead).toBe(true);
+    expect(res.status).toBe(204);
+
+    const getRes = await request(app).get(`/books/${createdBookId}`);
+    expect((getRes.body as { isRead: boolean }).isRead).toBe(true);
   });
 
   it('DELETE /books/:id - should successfully delete the book', async () => {

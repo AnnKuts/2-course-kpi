@@ -1,10 +1,10 @@
 import { DomainError } from '../errors/DomainError';
 import { Book } from '../models/Book';
 import { Genre } from '../models/Genre';
-import { BookRepository } from '../repositories/book.repository';
+import { IBookReadRepository } from '../repositories/IBookReadRepository';
 
 export class BookFactory {
-  constructor(private readonly bookRepository: BookRepository) {}
+  constructor(private readonly bookRepository: IBookReadRepository) {}
 
   create = async (
     id: number,

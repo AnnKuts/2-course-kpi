@@ -1,12 +1,13 @@
 import { describe, it, expect, vi, beforeEach } from 'vitest';
+import type { Mocked } from 'vitest';
 import { BookFactory } from '../../src/domain/factories/BookFactory';
-import { BookRepository } from '../../src/domain/repositories/book.repository';
+import { IBookReadRepository } from '../../src/domain/repositories/IBookReadRepository';
 import { Genre } from '../../src/domain/models/Genre';
 import { DomainError } from '../../src/domain/errors/DomainError';
 import { Book } from '../../src/domain/models/Book';
 
 describe('Book Domain Model & Factory', () => {
-  let mockRepository: BookRepository;
+  let mockRepository: Mocked<IBookReadRepository>;
   let factory: BookFactory;
 
   beforeEach(() => {
@@ -15,9 +16,6 @@ describe('Book Domain Model & Factory', () => {
       findById: vi.fn(),
       findByTitleAndAuthor: vi.fn().mockResolvedValue(null),
       findReadBooks: vi.fn(),
-      create: vi.fn(),
-      update: vi.fn(),
-      delete: vi.fn(),
     };
     factory = new BookFactory(mockRepository);
   });

@@ -1,27 +1,27 @@
 import { Request, Response } from 'express';
 
-import {
-  CreateBookUseCase,
-  DeleteBookUseCase,
-  GetAllBooksUseCase,
-  GetBookByIdUseCase,
-  GetReadBooksUseCase,
-  MarkAsReadUseCase,
-  RateBookUseCase,
-  UpdateBookUseCase,
-} from '../../application/use-cases/BookUseCases';
+import { CreateBookCommandHandler } from '../../application/commands/CreateBookCommand';
+import { UpdateBookCommandHandler } from '../../application/commands/UpdateBookCommand';
+import { DeleteBookCommandHandler } from '../../application/commands/DeleteBookCommand';
+import { RateBookCommandHandler } from '../../application/commands/RateBookCommand';
+import { MarkAsReadCommandHandler } from '../../application/commands/MarkAsReadCommand';
+
+import { GetAllBooksQueryHandler } from '../../application/queries/GetAllBooksQuery';
+import { GetBookByIdQueryHandler } from '../../application/queries/GetBookByIdQuery';
+import { GetReadBooksQueryHandler } from '../../application/queries/GetReadBooksQuery';
+
 import { DomainError } from '../../domain/errors/DomainError';
-import { createBookSchema, paginationSchema } from '../../schemas/book.schema';
+import { CreateBookCommand } from '../../application/commands/CreateBookCommand';
 
 export interface BookControllerUseCases {
-  getAllBooks: GetAllBooksUseCase;
-  getBookById: GetBookByIdUseCase;
-  createBook: CreateBookUseCase;
-  updateBook: UpdateBookUseCase;
-  deleteBook: DeleteBookUseCase;
-  getReadBooks: GetReadBooksUseCase;
-  rateBook: RateBookUseCase;
-  markAsRead: MarkAsReadUseCase;
+  getAllBooks: GetAllBooksQueryHandler;
+  getBookById: GetBookByIdQueryHandler;
+  getReadBooks: GetReadBooksQueryHandler;
+  createBook: CreateBookCommandHandler;
+  updateBook: UpdateBookCommandHandler;
+  deleteBook: DeleteBookCommandHandler;
+  rateBook: RateBookCommandHandler;
+  markAsRead: MarkAsReadCommandHandler;
 }
 
 export class BookController {
@@ -36,40 +36,38 @@ export class BookController {
   };
 
   public getAll = async (req: Request, res: Response): Promise<void> => {
-    const { limit, offset } = paginationSchema.parse(req.query);
-    const books = await this.useCases.getAllBooks.execute(limit, offset);
+    const { limit, offset } = req.query as unknown as { limit: number; offset: number }; 
+    const books = await this.useCases.getAllBooks.execute({ limit, offset });
     res.status(200).json(books);
   };
 
   public getById = async (req: Request, res: Response): Promise<void> => {
     const id = this.extractId(req);
-    const book = await this.useCases.getBookById.execute(id);
+    const book = await this.useCases.getBookById.execute({ id });
     res.status(200).json(book);
   };
 
+  public getReadBooks = async (req: Request, res: Response): Promise<void> => {
+    const { limit, offset } = req.query as unknown as { limit: number; offset: number };
+    const books = await this.useCases.getReadBooks.execute({ limit, offset });
+    res.status(200).json(books);
+  };
+
   public create = async (req: Request, res: Response): Promise<void> => {
-    const parsedData = createBookSchema.parse(req.body);
-    const newBook = await this.useCases.createBook.execute(parsedData);
-    res.status(201).json(newBook);
+    const newBookId = await this.useCases.createBook.execute(req.body as unknown as CreateBookCommand);
+    res.status(201).json({ id: newBookId }); 
   };
 
   public update = async (req: Request, res: Response): Promise<void> => {
     const id = this.extractId(req);
-    const parsedData = createBookSchema.partial().parse(req.body);
-    const updatedBook = await this.useCases.updateBook.execute(id, parsedData);
-    res.status(200).json(updatedBook);
+    await this.useCases.updateBook.execute({ id, data: req.body as unknown as Partial<CreateBookCommand> });
+    res.status(204).send();
   };
 
   public delete = async (req: Request, res: Response): Promise<void> => {
     const id = this.extractId(req);
-    await this.useCases.deleteBook.execute(id);
+    await this.useCases.deleteBook.execute({ id });
     res.status(204).send();
-  };
-
-  public getReadBooks = async (req: Request, res: Response): Promise<void> => {
-    const { limit, offset } = paginationSchema.parse(req.query);
-    const books = await this.useCases.getReadBooks.execute(limit, offset);
-    res.status(200).json(books);
   };
 
   public rate = async (req: Request, res: Response): Promise<void> => {
@@ -80,13 +78,13 @@ export class BookController {
       throw new DomainError('Rating must be a number');
     }
 
-    const updatedBook = await this.useCases.rateBook.execute(id, rating);
-    res.status(200).json(updatedBook);
+    await this.useCases.rateBook.execute({ id, rating });
+    res.status(204).send();
   };
 
   public markAsRead = async (req: Request, res: Response): Promise<void> => {
     const id = this.extractId(req);
-    const updatedBook = await this.useCases.markAsRead.execute(id);
-    res.status(200).json(updatedBook);
+    await this.useCases.markAsRead.execute({ id });
+    res.status(204).send();
   };
 }
