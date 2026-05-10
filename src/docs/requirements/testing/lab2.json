@@ -1,0 +1,66 @@
+{
+  "create": {
+    "classic": {
+      "title": "The Great Gatsby",
+      "author": "F. Scott Fitzgerald",
+      "genre": "Fiction",
+      "rating": 5,
+      "description": "A story about the American dream and tragic love.",
+      "isRead": false
+    },
+    "science": {
+      "title": "A Brief History of Time",
+      "author": "Stephen Hawking",
+      "genre": "Science",
+      "rating": 5,
+      "description": "Explaining cosmology to a general audience.",
+      "isRead": true
+    },
+    "fantasy": {
+      "title": "The Hobbit",
+      "author": "J.R.R. Tolkien",
+      "genre": "Fantasy",
+      "rating": 4,
+      "description": "Bilbo Baggins goes on an adventure.",
+      "isRead": false
+    }
+  },
+  "update": {
+    "partial": {
+      "title": "The Great Gatsby (Special Edition)",
+      "rating": 4,
+      "isRead": true
+    }
+  },
+  "rate": {
+    "valid": {
+      "rating": 3
+    }
+  },
+  "errorCases": {
+    "invalidRating": {
+      "title": "Bad Rating",
+      "author": "Someone",
+      "genre": "Fiction",
+      "rating": 10,
+      "description": "This should fail because rating > 5",
+      "isRead": false
+    },
+    "emptyFields": {
+      "title": "",
+      "author": " ",
+      "genre": "Science",
+      "rating": 5,
+      "description": "Empty title and author",
+      "isRead": false
+    },
+    "duplicate": {
+      "title": "The Hobbit",
+      "author": "J.R.R. Tolkien",
+      "genre": "Fantasy",
+      "rating": 5,
+      "description": "This should fail because title+author already exists",
+      "isRead": false
+    }
+  }
+}

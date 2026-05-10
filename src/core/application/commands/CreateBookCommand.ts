@@ -3,6 +3,7 @@ import { BookCreatedEvent } from '../../domain/events/BookCreatedEvent';
 import { BookFactory } from '../../domain/factories/BookFactory';
 import { Genre } from '../../domain/models/Genre';
 import { IBookWriteRepository } from '../../domain/repositories/IBookWriteRepository';
+import { IAuditService } from '../../audit/IAuditService';
 
 export type CreateBookCommand = {
   title: string;
@@ -16,11 +17,13 @@ export type CreateBookCommand = {
 export class CreateBookCommandHandler {
   constructor(
     private readonly bookRepository: IBookWriteRepository,
+    private readonly bookFactory: BookFactory,
     private readonly eventBus: IEventBus,
+    private readonly auditService: IAuditService,
   ) {}
 
   public async execute(command: CreateBookCommand): Promise<number> {
-    const newBook = BookFactory.create(
+    const newBook = await this.bookFactory.create(
       0,
       command.title,
       command.author,
@@ -31,12 +34,13 @@ export class CreateBookCommandHandler {
     );
 
     const savedBook = await this.bookRepository.create(newBook);
+    const event = new BookCreatedEvent(savedBook.id, command.title, command.author);
 
-    const event = new BookCreatedEvent(
-      savedBook.id,
-      command.title,
-      command.author,
-    );
+    try {
+      this.auditService.logBookCreated(event);
+    } catch (auditError) {
+      console.error('[CreateBookHandler] Sync audit failed (ignored):', auditError);
+    }
 
     this.eventBus.publish(event);
     return savedBook.id;

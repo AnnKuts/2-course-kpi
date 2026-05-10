@@ -3,14 +3,23 @@ import type { Mocked } from 'vitest';
 
 import { CreateBookCommandHandler } from '../../../src/core/application/commands/CreateBookCommand';
 import { IBookWriteRepository } from '../../../src/core/domain/repositories/IBookWriteRepository';
+import { IBookReadRepository } from '../../../src/core/domain/repositories/IBookReadRepository';
+import { BookFactory } from '../../../src/core/domain/factories/BookFactory';
 import { Book } from '../../../src/core/domain/models/Book';
 import { Genre } from '../../../src/core/domain/models/Genre';
 import { IEventBus } from '../../../src/infrastructure/events/EventContracts';
+import { IAuditService } from '../../../src/core/audit/IAuditService';
 
 describe('CreateBookCommandHandler', () => {
   let handler: CreateBookCommandHandler;
   let mockWriteRepository: Mocked<IBookWriteRepository>;
+  let mockReadRepository: Mocked<IBookReadRepository>;
   let mockEventBus: Mocked<IEventBus>;
+  let mockAuditService: Mocked<IAuditService>;
+  let factory: BookFactory;
+
+  const makeBook = (id = 1) =>
+    new Book(id, 'Test Book', 'Test Author', Genre.FICTION, 5, 'Test Desc', false);
 
   beforeEach(() => {
     mockWriteRepository = {
@@ -20,40 +29,88 @@ describe('CreateBookCommandHandler', () => {
       delete: vi.fn(),
     };
 
+    mockReadRepository = {
+      findAll: vi.fn(),
+      findById: vi.fn(),
+      findByTitleAndAuthor: vi.fn().mockResolvedValue(null),
+      findReadBooks: vi.fn(),
+    };
+
     mockEventBus = {
       publish: vi.fn(),
       subscribe: vi.fn(),
     };
 
-    handler = new CreateBookCommandHandler(mockWriteRepository, mockEventBus);
-  });
-
-  it('повинен успішно створити книгу, зберегти в репозиторій та опублікувати подію', async () => {
-    const command = {
-      title: 'Test Book',
-      author: 'Test Author',
-      genre: Genre.FICTION,
-      rating: 5,
-      description: 'Test Desc',
-      isRead: false,
+    mockAuditService = {
+      logBookCreated: vi.fn(),
     };
 
-    const createdBook = new Book(
-      1, command.title, command.author, command.genre, 
-      command.rating, command.description, command.isRead
+    factory = new BookFactory(mockReadRepository);
+    handler = new CreateBookCommandHandler(
+      mockWriteRepository,
+      factory,
+      mockEventBus,
+      mockAuditService,
     );
+  });
 
-    mockWriteRepository.create.mockResolvedValueOnce(createdBook);
+  const baseCommand = {
+    title: 'Test Book',
+    author: 'Test Author',
+    genre: Genre.FICTION,
+    rating: 5,
+    description: 'Test Desc',
+    isRead: false,
+  };
 
-    const resultId = await handler.execute(command);
+  it('should create a book, call sync audit, and publish async event', async () => {
+    mockWriteRepository.create.mockResolvedValueOnce(makeBook(1));
+
+    const resultId = await handler.execute(baseCommand);
 
     expect(resultId).toBe(1);
-    expect(mockWriteRepository.create.mock.calls.length).toBe(1);
-    
-    expect(mockEventBus.publish.mock.calls.length).toBe(1);
-    
-    const savedBook = mockWriteRepository.create.mock.calls[0][0];
-    expect(savedBook).toBeInstanceOf(Book);
-    expect(savedBook.title).toBe('Test Book');
+    expect(mockWriteRepository.create).toHaveBeenCalledOnce();
+    expect(mockAuditService.logBookCreated).toHaveBeenCalledOnce();
+    expect(mockAuditService.logBookCreated).toHaveBeenCalledWith(
+      expect.objectContaining({ eventName: 'BookCreatedEvent', bookId: 1 }),
+    );
+    expect(mockEventBus.publish).toHaveBeenCalledOnce();
+    expect(mockEventBus.publish).toHaveBeenCalledWith(
+      expect.objectContaining({ eventName: 'BookCreatedEvent' }),
+    );
+  });
+
+  it('should still create book and publish event when sync audit throws', async () => {
+    mockWriteRepository.create.mockResolvedValueOnce(makeBook(2));
+    mockAuditService.logBookCreated.mockImplementation(() => {
+      throw new Error('Audit service is unavailable');
+    });
+
+    const consoleSpy = vi.spyOn(console, 'error').mockImplementation(() => {});
+
+    const resultId = await handler.execute(baseCommand);
+
+    expect(resultId).toBe(2);
+    expect(mockWriteRepository.create).toHaveBeenCalledOnce();
+    expect(mockAuditService.logBookCreated).toHaveBeenCalledOnce();
+    expect(consoleSpy).toHaveBeenCalledWith(
+      expect.stringContaining('Sync audit failed'),
+      expect.any(Error),
+    );
+    expect(mockEventBus.publish).toHaveBeenCalledOnce();
+
+    consoleSpy.mockRestore();
+  });
+
+  it('should call sync audit before publishing the async event', async () => {
+    const callOrder: string[] = [];
+
+    mockWriteRepository.create.mockResolvedValueOnce(makeBook(3));
+    mockAuditService.logBookCreated.mockImplementation(() => { callOrder.push('sync'); });
+    mockEventBus.publish.mockImplementation(() => { callOrder.push('async'); });
+
+    await handler.execute(baseCommand);
+
+    expect(callOrder).toEqual(['sync', 'async']);
   });
 });

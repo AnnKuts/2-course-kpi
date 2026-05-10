@@ -3,10 +3,12 @@ import { open, Database } from 'sqlite';
 
 let dbInstance: Database | null = null;
 
-export async function initDb(): Promise<Database> {
+export async function initDb(
+  filename = './database.sqlite',
+): Promise<Database> {
   dbInstance = await open({
-    filename: './database.sqlite',
-    driver: sqlite3.Database
+    filename,
+    driver: sqlite3.Database,
   });
 
   await dbInstance.exec(`

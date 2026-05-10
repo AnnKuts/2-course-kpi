@@ -90,6 +90,15 @@ export class BookReadRepository implements IBookReadRepository {
     return this.mapRowToReadModel(row);
   }
 
+  public async findByTitleAndAuthor(title: string, author: string): Promise<BookReadModel | null> {
+    const row = await this.db.get<BookDbRow>(
+      'SELECT * FROM books WHERE title = ? AND author = ? LIMIT 1',
+      [title, author],
+    );
+    if (!row) return null;
+    return this.mapRowToReadModel(row);
+  }
+
   public async findReadBooks(limit: number = 10, offset: number = 0): Promise<BookReadModel[]> {
     const rows = await this.db.all<BookDbRow[]>(
       'SELECT * FROM books WHERE isRead = 1 ORDER BY id LIMIT ? OFFSET ?',
